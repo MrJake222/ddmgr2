@@ -1,0 +1,43 @@
+hosts:
+  bastion:
+    name: bastion
+    mac: ca:fe:de:ad:be:ef
+    ipv4: .0.1
+    ipv6: ::1
+    aname:
+      - '@'
+      
+  bpi-nas:
+    name: bpi
+    mac: ca:fe:de:ad:be:ef
+    ipv4: .0.1
+    ipv6: ::1
+    ports:
+      - tcp:25:25
+      - tcp:587:587
+      - tcp:53:53
+      - udp:53:53
+    cname:
+      - ns2
+      - mail
+      - torrent
+    mx:
+      pri: 10
+      
+  npc:
+    name: npc
+    mac: aa:bb:cc:dd:ee:ff
+    ipv4: .1.2
+    ipv6: ::2
+      
+  mpc:
+    name: npc
+    mac: aa:bb:cc:dd:ee:ff
+    ipv4: .1.6
+    ports:
+      - tcp:25565:25565 # minecraft
+      
+  rigol-scope:
+    name: rigol
+    mac: aa:bb:cc:dd:ee:ff
+    ipv4: .1.5
