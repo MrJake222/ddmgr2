@@ -90,7 +90,7 @@ void dnsrev6(std::ostream& os, const Subnet& subnet) {
 
         dns_record(
                 os,
-                host.ipv6->ptr(64), 0,
+                host.ipv6->ptr(FLAGS_dnsrev6_mask), 0,
                 "PTR",
                 subnet.fqdn(host) + ".");
     }
