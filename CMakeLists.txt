@@ -10,7 +10,6 @@ add_executable(ddmgr2
         src/subnet.cpp
         src/host.cpp
         src/parse.cpp
-        src/util.cpp
         src/datatypes/ipv4.cpp
         src/datatypes/ipv6.cpp
         src/datatypes/mac.cpp

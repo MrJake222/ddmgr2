@@ -2,6 +2,8 @@
 
 #include <string>
 
+namespace dt {
+
 class PortMap {
 
 public:
@@ -17,3 +19,5 @@ public:
             , to(to_)
     { }
 };
+
+} // namespace

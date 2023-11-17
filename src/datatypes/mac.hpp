@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+namespace dt {
+
 class MAC {
 
 public:
@@ -16,3 +18,5 @@ public:
             { }
     
 };
+
+} // namespace

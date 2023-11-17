@@ -1,7 +1,6 @@
 #include "parse.hpp"
 
 #include <host.hpp>
-#include <util.hpp>
 
 #include <iostream>
 using std::cout;
@@ -9,7 +8,57 @@ using std::endl;
 
 namespace parse {
 
-std::string checked_convert(const YAML::Node& conf, const std::string& name, const std::string& error_suffix) {
+class parse_error : public std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
+bool is_number(const std::string& str) {
+    return std::all_of(
+            str.begin(),
+            str.end(),
+            [](unsigned char c){ return std::isdigit(c); });
+}
+
+bool is_hex_number(const std::string& str) {
+    return std::all_of(
+            str.begin(),
+            str.end(),
+            [](unsigned char c){ return std::isxdigit(c); });
+}
+
+std::vector<std::string> to_groups(const std::string& in, char delim,
+                                   const std::string& error_tag,
+                                   int group_count_min, int group_count_max,
+                                   verify_group_fn verify) {
+    std::stringstream inss(in);
+    std::string group;
+    int group_idx = 0;
+    std::vector<std::string> groups;
+    while (getline(inss, group, delim)) {
+//        if (group.length() < group_size_min || group.length() > group_size_max)
+//            goto invalid;
+//        if (hex && !is_hex_number(group))
+//            goto invalid;
+//        if (number && !is_number(group))
+//            goto invalid;
+
+        if (!verify(group_idx, group))
+            goto invalid;
+
+        groups.push_back(group);
+        group_idx++;
+    }
+
+    if (groups.size() < group_count_min || groups.size() > group_count_max)
+        goto invalid;
+
+    return groups;
+
+    invalid:
+    throw parse_error("invalid " + error_tag + " group parsing: " + in);
+}
+
+std::string checked_as(const YAML::Node& conf, const std::string& name, const std::string& error_suffix) {
     if (!conf[name])
         throw parse_error("required field "+name+" missing " + error_suffix);
 
@@ -20,10 +69,10 @@ Subnet yaml_to_subnet(YAML::Node conf) {
 
     std::vector<Host> hosts;
 
-    auto v4_prefix   = checked_convert(conf, "v4_prefix",   "");
-    auto v4_external = checked_convert(conf, "v4_external", "");
-    auto v6_prefix   = checked_convert(conf, "v6_prefix",   "");
-    auto domain      = checked_convert(conf, "domain",      "");
+    auto v4_prefix   = checked_as(conf, "v4_prefix", "");
+    auto v4_external = checked_as(conf, "v4_external", "");
+    auto v6_prefix   = checked_as(conf, "v6_prefix", "");
+    auto domain      = checked_as(conf, "domain", "");
 
     for (auto hostmap: conf["hosts"]) {
         // hostmap is a key-value map, key being arbitrary value not to be used
@@ -34,9 +83,9 @@ Subnet yaml_to_subnet(YAML::Node conf) {
         // required: name, mac, ipv4
         // optional: ipv6, ports, aname, cname, mx
 
-        auto name = checked_convert(hostinfo, "name", "on host");
-        auto mac  = checked_convert(hostinfo, "mac",  "on host " + name);
-        auto ipv4 = checked_convert(hostinfo, "ipv4", "on host " + name);
+        auto name = checked_as(hostinfo, "name", "on host");
+        auto mac  = checked_as(hostinfo, "mac", "on host " + name);
+        auto ipv4 = checked_as(hostinfo, "ipv4", "on host " + name);
 
         hosts.emplace_back(
                 name,
@@ -44,12 +93,12 @@ Subnet yaml_to_subnet(YAML::Node conf) {
                 parse_ipv4(name, v4_prefix + hostinfo["ipv4"].as<std::string>()),
 
                 hostinfo["ipv6"]
-                    ? std::optional<IPv6>{parse_ipv6(name, v6_prefix + hostinfo["ipv6"].as<std::string>())}
+                    ? std::optional<dt::IPv6>{parse_ipv6(name, v6_prefix + hostinfo["ipv6"].as<std::string>())}
                     : std::nullopt,
 
                 hostinfo["ports"]
                     ? parse_ports(name, hostinfo["ports"].as<std::vector<std::string>>())
-                    : std::vector<PortMap>{},
+                    : std::vector<dt::PortMap>{},
 
                 hostinfo["aname"]
                     ? hostinfo["aname"].as<std::vector<std::string>>()
@@ -71,20 +120,20 @@ Subnet yaml_to_subnet(YAML::Node conf) {
     return { hosts };
 }
 
-MAC parse_mac(const std::string& host, const std::string& in) {
+dt::MAC parse_mac(const std::string& host, const std::string& in) {
 
-    util::verify_group_fn verify = [](int idx, const std::string& group) {
+    verify_group_fn verify = [](int idx, const std::string& group) {
         if (group.length() > 2)
             return false;
 
-        if (!util::is_hex_number(group))
+        if (!is_hex_number(group))
             return false;
 
         return true;
     };
 
     std::vector<std::string> groups =
-            util::to_groups(in, ':',
+            to_groups(in, ':',
                             host + " mac",
                             6, 6,
                             verify);
@@ -92,13 +141,13 @@ MAC parse_mac(const std::string& host, const std::string& in) {
     return {in, groups};
 }
 
-IPv4 parse_ipv4(const std::string& host, const std::string& in) {
+dt::IPv4 parse_ipv4(const std::string& host, const std::string& in) {
 
-    util::verify_group_fn verify = [](int idx, const std::string& group) {
+    verify_group_fn verify = [](int idx, const std::string& group) {
         if (group.length() > 3)
             return false;
 
-        if (!util::is_number(group))
+        if (!is_number(group))
             return false;
 
         int val = stoi(group);
@@ -109,7 +158,7 @@ IPv4 parse_ipv4(const std::string& host, const std::string& in) {
     };
 
     std::vector<std::string> groups =
-            util::to_groups(in, '.',
+            to_groups(in, '.',
                             host + " ipv4",
                             4, 4,
                             verify);
@@ -117,20 +166,20 @@ IPv4 parse_ipv4(const std::string& host, const std::string& in) {
     return {in, groups};
 }
 
-IPv6 parse_ipv6(const std::string& host, const std::string& in) {
+dt::IPv6 parse_ipv6(const std::string& host, const std::string& in) {
 
-    util::verify_group_fn verify = [](int idx, const std::string& group) {
+    verify_group_fn verify = [](int idx, const std::string& group) {
         if (group.length() > 4)
             return false;
 
-        if (!util::is_hex_number(group))
+        if (!is_hex_number(group))
             return false;
 
         return true;
     };
 
     std::vector<std::string> groups =
-            util::to_groups(in, ':',
+            to_groups(in, ':',
                             host + " ipv6",
                             1, 8,
                             verify);
@@ -157,14 +206,14 @@ invalid:
     throw parse_error("invalid " + host + " ipv6 parsing: " + in);
 }
 
-std::vector<PortMap> parse_ports(const std::string& host, const std::vector<std::string>& ports) {
+std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<std::string>& ports) {
 
-    std::vector<PortMap> maps;
+    std::vector<dt::PortMap> maps;
 
-    util::verify_group_fn verify = [](int idx, const std::string& group) {
+    verify_group_fn verify = [](int idx, const std::string& group) {
         if (idx == 1 || idx == 2) {
             // ports
-            if (!util::is_number(group))
+            if (!is_number(group))
                 return false;
 
             int val = stoi(group);
@@ -177,7 +226,7 @@ std::vector<PortMap> parse_ports(const std::string& host, const std::vector<std:
 
     for (const auto& port : ports) {
         std::vector<std::string> g =
-                util::to_groups(port, ':',
+                to_groups(port, ':',
                                 host + " ports",
                                 3, 3,
                                 verify);

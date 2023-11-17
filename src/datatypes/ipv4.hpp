@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+namespace dt {
+
 class IPv4 {
 
 public:
@@ -16,3 +18,5 @@ public:
     { }
 
 };
+
+} // namespace
