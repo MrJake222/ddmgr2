@@ -17,6 +17,8 @@ public:
             , groups(groups_)
     { }
 
+    // get reverse dns record name
+    std::string ptr(int mask) const;
 };
 
 } // namespace

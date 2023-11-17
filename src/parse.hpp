@@ -19,11 +19,17 @@
 
 namespace parse {
 
+class parse_error : public std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
 
 // --------------- helper functions ---------------
+namespace {
+// private namespace
 
 bool is_number(const std::string& str);
 bool is_hex_number(const std::string& str);
+void zfill(std::string& str, size_t to);
 
 typedef bool (*verify_group_fn)(int group_idx, const std::string& group);
 
@@ -34,10 +40,14 @@ std::vector<std::string> to_groups(const std::string& in, char delim,
 
 std::string checked_as(const YAML::Node& conf, const std::string& name, const std::string& error_suffix);
 
+// vector<string> to string
+std::string vs2s(const std::vector<std::string>& v);
+
+} // end private namespace
 
 // --------------- parsing functions ---------------
 
-Subnet yaml_to_subnet(YAML::Node conf);
+Subnet yaml_to_subnet(const YAML::Node& conf);
 dt::MAC parse_mac(const std::string& host, const std::string& in);
 dt::IPv4 parse_ipv4(const std::string& host, const std::string& in);
 dt::IPv6 parse_ipv6(const std::string& host, const std::string& in);

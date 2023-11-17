@@ -22,6 +22,7 @@ hosts:
       - tcp:587:587
       - tcp:53:53
       - udp:53:53
+      - udp:25565 # ipv6 open port only
     cname:
       - ns2
       - mail

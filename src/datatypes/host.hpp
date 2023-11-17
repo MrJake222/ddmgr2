@@ -12,6 +12,8 @@
 
 class Host {
 
+    std::vector<std::string> anames_;
+
 public:
     const std::string name;
     const dt::MAC mac;
@@ -38,5 +40,12 @@ public:
             , aname(aname_)
             , cname(cname_)
             , mx(mx_)
-            { }
+            {
+        anames_.emplace_back(name);
+        anames_.insert(anames_.begin(), aname.begin(), aname.end());
+            }
+
+    // returns name + aname records
+    // useful for writing A/AAAA records
+    std::vector<std::string> anames() const { return anames_; }
 };

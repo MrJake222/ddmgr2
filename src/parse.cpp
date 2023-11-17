@@ -6,12 +6,12 @@
 using std::cout;
 using std::endl;
 
+#include <flags.hpp>
+
 namespace parse {
 
-class parse_error : public std::runtime_error {
-    using std::runtime_error::runtime_error;
-};
-
+namespace {
+// private namespace
 bool is_number(const std::string& str) {
     return std::all_of(
             str.begin(),
@@ -24,6 +24,14 @@ bool is_hex_number(const std::string& str) {
             str.begin(),
             str.end(),
             [](unsigned char c){ return std::isxdigit(c); });
+}
+
+void zfill(std::string& str, size_t to) {
+    std::string zeroes;
+    for (int i=0; i<to-str.length(); i++)
+        zeroes += '0';
+
+    str = zeroes + str;
 }
 
 std::vector<std::string> to_groups(const std::string& in, char delim,
@@ -65,7 +73,19 @@ std::string checked_as(const YAML::Node& conf, const std::string& name, const st
     return conf[name].as<std::string>();
 }
 
-Subnet yaml_to_subnet(YAML::Node conf) {
+std::string vs2s(const std::vector<std::string>& v) {
+    std::string out;
+    for (const auto& e : v) {
+        out += e;
+        out += " ";
+    }
+    out.pop_back(); // remove trailing space
+    return out;
+}
+
+} // end private namespace
+
+Subnet yaml_to_subnet(const YAML::Node& conf) {
 
     std::vector<Host> hosts;
 
@@ -114,10 +134,15 @@ Subnet yaml_to_subnet(YAML::Node conf) {
 
                 );
 
-        print_host(hosts.back());
+        if (FLAGS_verbose)
+            print_host(hosts.back());
     }
 
-    return { hosts };
+    return { v4_prefix,
+             v4_external,
+             v6_prefix,
+             domain,
+             hosts };
 }
 
 dt::MAC parse_mac(const std::string& host, const std::string& in) {
@@ -197,6 +222,10 @@ dt::IPv6 parse_ipv6(const std::string& host, const std::string& in) {
         }
     }
 
+    // zero-fill groups for ipv6 reverse zones to work
+    for (std::string& group : groups)
+        zfill(group, 4);
+
     while (groups.size() < 8)
         groups.insert(groups.begin() + empty_index, "0000");
 
@@ -228,10 +257,18 @@ std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<
         std::vector<std::string> g =
                 to_groups(port, ':',
                                 host + " ports",
-                                3, 3,
+                                2, 3,
                                 verify);
 
-        maps.emplace_back(g[0], stoi(g[1]), stoi(g[2]));
+        if (g.size() == 2)
+            // only proto:port given
+            // open v6 port only
+            maps.emplace_back(g[0], std::nullopt, stoi(g[1]));
+
+        else
+            // proto:external:internal given
+            // open port v4/v6, do nat from external to internal
+            maps.emplace_back(g[0], std::optional<int>{stoi(g[1])}, stoi(g[2]));
     }
 
     return maps;
@@ -239,13 +276,19 @@ std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<
 
 void print_host(const Host& host) {
     cout << "host name=" << host.name << endl;
-    cout << "  mac=" << host.mac.orig << endl;
-    cout << "  ipv4=" << host.ipv4.orig << endl;
-    cout << "  ipv6=" << (host.ipv6 ? host.ipv6->orig : "[no v6]") << endl;
+    cout << "  mac=" << host.mac.orig << " -> " << vs2s(host.mac.groups) << endl;
+    cout << "  ipv4=" << host.ipv4.orig << " -> " << vs2s(host.ipv4.groups) << endl;
+    if (host.ipv6)
+        cout << "  ipv6=" << host.ipv6->orig << " -> " << vs2s(host.ipv6->groups) << endl;
+    else
+        cout << "  [no ipv6]" << endl;
 
     cout << "  ports=";
-    for (const auto& m : host.ports)
-        cout << m.from << "->" << m.to << "/" << m.proto << " ";
+    for (const auto& m: host.ports) {
+        if (m.from)
+            cout << *m.from << "->";
+        cout << m.to << "/" << m.proto << " ";
+    }
     cout << endl;
 
     cout << "  aname=";
