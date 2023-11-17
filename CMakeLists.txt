@@ -3,8 +3,6 @@ project(ddmgr2)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(libs/yaml-cpp)
-
 add_executable(ddmgr2
         src/main.cpp
         src/subnet.cpp
