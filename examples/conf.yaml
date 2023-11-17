@@ -1,3 +1,8 @@
+v4_prefix: 172.16
+v4_external: 1.2.3.4
+v6_prefix: fc00
+domain: site.example.com
+
 hosts:
   bastion:
     name: bastion
@@ -11,7 +16,7 @@ hosts:
     name: bpi
     mac: ca:fe:de:ad:be:ef
     ipv4: .0.1
-    ipv6: ::1
+    ipv6: ::2
     ports:
       - tcp:25:25
       - tcp:587:587
@@ -21,14 +26,13 @@ hosts:
       - ns2
       - mail
       - torrent
-    mx:
-      pri: 10
+    mx: 10
       
   npc:
     name: npc
     mac: aa:bb:cc:dd:ee:ff
     ipv4: .1.2
-    ipv6: ::2
+    ipv6: ::3
       
   mpc:
     name: npc

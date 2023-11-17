@@ -3,8 +3,11 @@ using std::cout, std::endl;
 
 #include <yaml-cpp/yaml.h>
 
-int main() {
-    YAML::Node config = YAML::LoadFile("examples/conf.yaml");
+#include <parse.hpp>
+#include <subnet.hpp>
 
-    cout << config["hosts"]["bastion"];
+int main() {
+    YAML::Node subnet_conf = YAML::LoadFile("examples/conf.yaml");
+
+    parse::yaml_to_subnet(subnet_conf);
 }
