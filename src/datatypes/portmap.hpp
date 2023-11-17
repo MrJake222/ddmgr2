@@ -19,6 +19,8 @@ public:
             , from(from_)
             , to(to_)
     { }
+
+    std::string pretty() const;
 };
 
 } // namespace

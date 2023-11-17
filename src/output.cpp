@@ -7,11 +7,11 @@ namespace output {
 namespace {
 // private namespace
 
-void dns_record(std::ostream& os, const std::string& name,
+void dns_record(std::ostream& os, const std::string& name, int name_max_len,
                 const std::string& record_type, const std::string& value) {
     // LAPTOP-CO9OHV8O A 192.168.1.179
-    os << name << " ";
-    os << record_type << " ";
+    os << pad(name, name_max_len) << "    ";
+    os << pad(record_type, 5)     << "    ";
     os << value;
     os << std::endl;
 }
@@ -20,19 +20,26 @@ void dns(std::ostream& os, const Subnet& subnet, bool internal) {
     for (const auto& host : subnet.hosts) {
 
         for (const auto& aname : host.anames()) {
-            dns_record(os, aname, "A",
+            dns_record(os, aname, subnet.maxlen, "A",
                        internal
                            ? host.ipv4.orig
                            : subnet.v4_external);
 
             if (host.ipv6)
-                dns_record(os, aname, "AAAA", host.ipv6->orig);
+                dns_record(os, aname, subnet.maxlen, "AAAA", host.ipv6->orig);
         }
 
         for (const auto& cname : host.cname) {
-            dns_record(os, cname, "CNAME", host.name);
+            dns_record(os, cname, subnet.maxlen, "CNAME", host.name);
         }
     }
+}
+
+std::string pad(const std::string& str, int to) {
+    std::string copy(str);
+    while (copy.length() < to)
+        copy += ' ';
+    return copy;
 }
 
 } // end private namespace
@@ -41,7 +48,7 @@ void dns(std::ostream& os, const Subnet& subnet, bool internal) {
 void dhcp(std::ostream& os, const Subnet& subnet) {
     for (const auto& host : subnet.hosts) {
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address 192.168.1.2; }
-        os << "host " << host.name << " { ";
+        os << "host " << pad(host.name, subnet.maxlen) << " { ";
         os << "hardware ethernet " << host.mac.orig << "; ";
         os << "fixed-address " << host.ipv4.orig << "; ";
         os << "}" << std::endl;
@@ -54,7 +61,7 @@ void dhcpv6(std::ostream& os, const Subnet& subnet) {
             return;
 
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address6 fd00::1; }
-        os << "host " << host.name << " { ";
+        os << "host " << pad(host.name, subnet.maxlen) << " { ";
         os << "hardware ethernet " << host.mac.orig << "; ";
         os << "fixed-address6 " << host.ipv6->orig << "; ";
         os << "}" << std::endl;
@@ -78,7 +85,7 @@ void dnsrev6(std::ostream& os, const Subnet& subnet) {
 
         dns_record(
                 os,
-                host.ipv6->ptr(64),
+                host.ipv6->ptr(64), 0,
                 "PTR",
                 subnet.fqdn(host) + ".");
     }
@@ -86,7 +93,11 @@ void dnsrev6(std::ostream& os, const Subnet& subnet) {
 
 void nft(std::ostream& os, const Subnet& subnet) {
     for (const auto& host : subnet.hosts) {
+        if (!host.ports.empty())
+            os << "# host " << host.name << std::endl;
+
         for (const auto& map : host.ports) {
+            os << "# " << map.pretty() << std::endl;
 
             if (host.ipv6) {
                 // ipv6 forward rule
@@ -114,6 +125,9 @@ void nft(std::ostream& os, const Subnet& subnet) {
                     << std::endl;
             }
         }
+
+        if (!host.ports.empty())
+            os << std::endl;
     }
 }
 

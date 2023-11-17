@@ -8,6 +8,8 @@ using std::endl;
 
 #include <flags.hpp>
 
+#define MAX(a, b) ((a)>(b) ? (a) : (b))
+
 namespace parse {
 
 namespace {
@@ -94,6 +96,8 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
     auto v6_prefix   = checked_as(conf, "v6_prefix", "");
     auto domain      = checked_as(conf, "domain", "");
 
+    int host_name_max_len = 0;
+
     for (auto hostmap: conf["hosts"]) {
         // hostmap is a key-value map, key being arbitrary value not to be used
         // value is what counts, contains all important information about the host
@@ -134,15 +138,25 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
 
                 );
 
+        const Host& host = hosts.back();
+
+        // calculate max lenght across all aliases of the host
+        host_name_max_len = MAX(host_name_max_len, host.name.length());
+        for (const auto& n : host.aname)
+            host_name_max_len = MAX(host_name_max_len, n.length());
+        for (const auto& n : host.cname)
+            host_name_max_len = MAX(host_name_max_len, n.length());
+
         if (FLAGS_verbose)
-            print_host(hosts.back());
+            print_host(host);
     }
 
     return { v4_prefix,
              v4_external,
              v6_prefix,
              domain,
-             hosts };
+             hosts,
+             host_name_max_len };
 }
 
 dt::MAC parse_mac(const std::string& host, const std::string& in) {
@@ -284,11 +298,8 @@ void print_host(const Host& host) {
         cout << "  [no ipv6]" << endl;
 
     cout << "  ports=";
-    for (const auto& m: host.ports) {
-        if (m.from)
-            cout << *m.from << "->";
-        cout << m.to << "/" << m.proto << " ";
-    }
+    for (const auto& m: host.ports)
+        cout << m.pretty() << " ";
     cout << endl;
 
     cout << "  aname=";

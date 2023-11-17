@@ -42,7 +42,7 @@ public:
             , mx(mx_)
             {
         anames_.emplace_back(name);
-        anames_.insert(anames_.begin(), aname.begin(), aname.end());
+        anames_.insert(anames_.end(), aname.begin(), aname.end());
             }
 
     // returns name + aname records

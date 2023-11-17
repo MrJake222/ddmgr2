@@ -22,7 +22,6 @@ hosts:
       - tcp:587:587
       - tcp:53:53
       - udp:53:53
-      - udp:25565 # ipv6 open port only
     cname:
       - ns2
       - mail
@@ -34,9 +33,11 @@ hosts:
     mac: aa:bb:cc:dd:ee:ff
     ipv4: .1.2
     ipv6: ::3
-      
+    ports:
+      - tcp:25565 # ipv6 open port only
+
   mpc:
-    name: npc
+    name: mpc
     mac: aa:bb:cc:dd:ee:ff
     ipv4: .1.6
     ports:
