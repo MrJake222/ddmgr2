@@ -17,9 +17,9 @@ void dns_record(std::ostream& os, const std::string& name, int name_max_len,
 }
 
 void dns(std::ostream& os, const Subnet& subnet, bool internal) {
-    for (const auto& host : subnet.hosts) {
+    for (const Host& host : subnet.hosts) {
 
-        for (const auto& aname : host.anames()) {
+        for (const std::string& aname : host.anames()) {
             dns_record(os, aname, subnet.maxlen, "A",
                        internal
                            ? host.ipv4.orig
@@ -29,7 +29,7 @@ void dns(std::ostream& os, const Subnet& subnet, bool internal) {
                 dns_record(os, aname, subnet.maxlen, "AAAA", host.ipv6->orig);
         }
 
-        for (const auto& cname : host.cname) {
+        for (const std::string& cname : host.cname) {
             dns_record(os, cname, subnet.maxlen, "CNAME", host.name);
         }
     }
@@ -46,7 +46,7 @@ std::string pad(const std::string& str, int to) {
 
 
 void dhcp(std::ostream& os, const Subnet& subnet) {
-    for (const auto& host : subnet.hosts) {
+    for (const Host& host : subnet.hosts) {
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address 192.168.1.2; }
         os << "host " << pad(host.name, subnet.maxlen) << " { ";
         os << "hardware ethernet " << host.mac.orig << "; ";
@@ -56,7 +56,7 @@ void dhcp(std::ostream& os, const Subnet& subnet) {
 }
 
 void dhcpv6(std::ostream& os, const Subnet& subnet) {
-    for (const auto& host : subnet.hosts) {
+    for (const Host& host : subnet.hosts) {
         if (!host.ipv6)
             return;
 
@@ -79,7 +79,7 @@ void dnsint(std::ostream& os, const Subnet& subnet) {
 void dnsrev6(std::ostream& os, const Subnet& subnet) {
     // 1.0.0.0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         PTR             c1.example.com.
 
-    for (const auto& host : subnet.hosts) {
+    for (const Host& host : subnet.hosts) {
         if (!host.ipv6)
             return;
 
@@ -92,16 +92,16 @@ void dnsrev6(std::ostream& os, const Subnet& subnet) {
 }
 
 void nft(std::ostream& os, const Subnet& subnet) {
-    for (const auto& host : subnet.hosts) {
+    for (const Host& host : subnet.hosts) {
         if (!host.ports.empty())
             os << "# host " << host.name << std::endl;
 
-        for (const auto& map : host.ports) {
+        for (const dt::PortMap& map : host.ports) {
             os << "# " << map.pretty() << std::endl;
 
             if (host.ipv6) {
                 // ipv6 forward rule
-                // add rule inet filter forward ip6 daddr 2001:470:6166::1:1 tcp dport 22 accept
+                // add rule inet filter forward ip6 daddr XXXX:YYYY:ZZZZ:AAAA::1:1 tcp dport 22 accept
                 os  << "add rule " << FLAGS_nft_chain_filter_forward << " "
                     << "ip6 daddr " << host.ipv6->orig << " "
                     << map.proto << " dport " << map.to << " "

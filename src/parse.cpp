@@ -77,7 +77,7 @@ std::string checked_as(const YAML::Node& conf, const std::string& name, const st
 
 std::string vs2s(const std::vector<std::string>& v) {
     std::string out;
-    for (const auto& e : v) {
+    for (const std::string& e : v) {
         out += e;
         out += " ";
     }
@@ -91,10 +91,10 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
 
     std::vector<Host> hosts;
 
-    auto v4_prefix   = checked_as(conf, "v4_prefix", "");
-    auto v4_external = checked_as(conf, "v4_external", "");
-    auto v6_prefix   = checked_as(conf, "v6_prefix", "");
-    auto domain      = checked_as(conf, "domain", "");
+    std::string v4_prefix   = checked_as(conf, "v4_prefix", "");
+    std::string v4_external = checked_as(conf, "v4_external", "");
+    std::string v6_prefix   = checked_as(conf, "v6_prefix", "");
+    std::string domain      = checked_as(conf, "domain", "");
 
     int host_name_max_len = 0;
 
@@ -107,9 +107,9 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
         // required: name, mac, ipv4
         // optional: ipv6, ports, aname, cname, mx
 
-        auto name = checked_as(hostinfo, "name", "on host");
-        auto mac  = checked_as(hostinfo, "mac", "on host " + name);
-        auto ipv4 = checked_as(hostinfo, "ipv4", "on host " + name);
+        std::string name = checked_as(hostinfo, "name", "on host");
+        std::string mac  = checked_as(hostinfo, "mac", "on host " + name);
+        std::string ipv4 = checked_as(hostinfo, "ipv4", "on host " + name);
 
         hosts.emplace_back(
                 name,
@@ -142,9 +142,9 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
 
         // calculate max lenght across all aliases of the host
         host_name_max_len = MAX(host_name_max_len, host.name.length());
-        for (const auto& n : host.aname)
+        for (const std::string& n : host.aname)
             host_name_max_len = MAX(host_name_max_len, n.length());
-        for (const auto& n : host.cname)
+        for (const std::string& n : host.cname)
             host_name_max_len = MAX(host_name_max_len, n.length());
 
         if (FLAGS_verbose)
@@ -267,7 +267,7 @@ std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<
         return true;
     };
 
-    for (const auto& port : ports) {
+    for (const std::string& port : ports) {
         std::vector<std::string> g =
                 to_groups(port, ':',
                                 host + " ports",
@@ -298,17 +298,17 @@ void print_host(const Host& host) {
         cout << "  [no ipv6]" << endl;
 
     cout << "  ports=";
-    for (const auto& m: host.ports)
+    for (const dt::PortMap& m: host.ports)
         cout << m.pretty() << " ";
     cout << endl;
 
     cout << "  aname=";
-    for (const auto& m : host.aname)
+    for (const std::string& m : host.aname)
         cout << m << " ";
     cout << endl;
 
     cout << "  cname=";
-    for (const auto& m : host.cname)
+    for (const std::string& m : host.cname)
         cout << m << " ";
     cout << endl;
 
