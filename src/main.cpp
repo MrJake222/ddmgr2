@@ -11,8 +11,9 @@ using std::cerr;
 
 #include <output.hpp>
 
-void check_write(const std::string& file, output::fptr outfn, const Subnet& subnet) {
+void check_write(const std::string& file, const std::string& name, output::fptr outfn, const Subnet& subnet) {
     if (file.length() > 0) {
+        cout << "get " << name << " -> " << file << endl;
         std::ofstream of(file, std::ios::app);
         outfn(of, subnet);
         of.close();
@@ -35,12 +36,12 @@ int main(int argc, char** argv) {
         cout << "done parsing input" << endl;
 
         // check each output flag and append to the files provided
-        check_write(FLAGS_dhcp, output::dhcp, subnet);
-        check_write(FLAGS_dhcpv6, output::dhcpv6, subnet);
-        check_write(FLAGS_dnsext, output::dnsext, subnet);
-        check_write(FLAGS_dnsint, output::dnsint, subnet);
-        check_write(FLAGS_dnsrev6, output::dnsrev6, subnet);
-        check_write(FLAGS_nft, output::nft, subnet);
+        check_write(FLAGS_dhcp,    "dhcp   ", output::dhcp,    subnet);
+        check_write(FLAGS_dhcpv6,  "dhcpv6 ", output::dhcpv6,  subnet);
+        check_write(FLAGS_dnsext,  "dnsext ", output::dnsext,  subnet);
+        check_write(FLAGS_dnsint,  "dnsint ", output::dnsint,  subnet);
+        check_write(FLAGS_dnsrev6, "dnsrev6", output::dnsrev6, subnet);
+        check_write(FLAGS_nft,     "nft    ", output::nft,     subnet);
     }
     catch (const YAML::Exception& e) {
         cerr << "yaml parser error: " << e.what() << endl;
