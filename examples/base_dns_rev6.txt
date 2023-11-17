@@ -1,0 +1,12 @@
+$TTL 1d
+$ORIGIN 0.0.0.0.0.0.0.0.0.0.d.f.ip6.arpa.
+@  SOA	net-rtr.home.local. mail.home.local. (
+				2302032053 ; serial
+				10800      ; refresh (3 hours)
+				300        ; retry (5 minutes)
+				604800     ; expire (1 week)
+				86400      ; minimum (1 day)
+)
+@		NS	net-rtr.home.local.
+
+

@@ -1,0 +1,10 @@
+$TTL 1d
+$ORIGIN site.example.com.
+@  SOA	net-rtr.site.example.com. mail.site.example.com. (
+				SERIAL ; serial
+				10800      ; refresh (3 hours)
+				300        ; retry (5 minutes)
+				604800     ; expire (1 week)
+				86400      ; minimum (1 day)
+)
+@		NS	net-rtr.site.example.com.

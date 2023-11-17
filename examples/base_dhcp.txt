@@ -1,0 +1,19 @@
+# dhcpd.conf
+
+# default lease = 6 hours, max lease = 24 hours
+default-lease-time 21600;
+max-lease-time 86400;
+
+# network boot
+# next-server 192.168.1.1;
+# filename "pxelinux.0";
+
+# subnet 1 on br0
+subnet 192.168.1.0 netmask 255.255.255.0 {
+	range						192.168.1.128 192.168.1.253;
+	option routers				192.168.1.254;
+	option domain-name-servers	192.168.1.1;
+	option domain-name			"home.local";
+}
+
+# static allocations

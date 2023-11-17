@@ -1,0 +1,17 @@
+# dhcpdv6.conf
+
+# default lease = 6 hours, max lease = 24 hours
+default-lease-time 21600;
+max-lease-time 86400;
+
+# Global definitions for name server address(es) and domain search list
+option dhcp6.name-servers fd00::1;
+option dhcp6.domain-search "home.local";
+
+subnet6 fd00::/64 {
+	range6 fd00::8000 fd00::FFFF;
+}
+
+# static allocations
+
+host c1       { hardware ethernet 08:00:27:xx:xx:xx; fixed-address6 fd00::2; }
