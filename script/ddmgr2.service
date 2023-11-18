@@ -1,11 +1,14 @@
 [Unit]
-Description=Generate network configs
+Description=ddmgr2 network configs
+# really important
+# config service needs to finish before starting server units
 Before=isc-dhcp-server.service named.service nftables.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/bin/ddmgr2_config
+ExecStart=/usr/local/bin/ddmgr2_config.sh
 
 [Install]
+# Value identical with Before= in [Unit]
 RequiredBy=isc-dhcp-server.service named.service nftables.service

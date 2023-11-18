@@ -6,6 +6,8 @@
 using std::cout;
 using std::endl;
 
+#include <algorithm>
+
 #include <flags.hpp>
 
 #define MAX(a, b) ((a)>(b) ? (a) : (b))

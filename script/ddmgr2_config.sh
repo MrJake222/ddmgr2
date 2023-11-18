@@ -36,9 +36,9 @@ for yaml in ${DIR_CONF_SUBNETS}/*; do
         --dnsrev6 ${OUT_DNS_REV6}   \
         --nft ${OUT_NFTABLES}       \
         \
-        --dnsrev6_mask ${OUT_dnsrev6_mask}
-        --nft_chain_filter_forward ${OUT_nft_chain_filter_forward}
-        --nft_chain_nat_prerouting ${OUT_nft_chain_nat_prerouting}
+        --dnsrev6_mask ${OUT_dnsrev6_mask} \
+        --nft_chain_filter_forward "${OUT_nft_chain_filter_forward}" \
+        --nft_chain_nat_prerouting "${OUT_nft_chain_nat_prerouting}" \
         --nft_net_internal ${OUT_nft_net_internal}
 done
 

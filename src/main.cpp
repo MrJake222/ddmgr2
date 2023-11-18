@@ -13,7 +13,7 @@ using std::cerr;
 
 void check_write(const std::string& file, const std::string& name, output::fptr outfn, const Subnet& subnet) {
     if (file.length() > 0) {
-        cout << "get " << name << " -> " << file << endl;
+        cout << "gen " << name << " -> " << file << endl;
         std::ofstream of(file, std::ios::app);
         outfn(of, subnet);
         of.close();

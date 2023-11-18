@@ -18,7 +18,7 @@ IN_SERVICE="${PROJ_NAME}.service"
 IN_EXAMPLES="../examples"
 
 if [[ $# != 1 ]]; then
-	echo "1 argument expected: [install/uninstall]"
+	echo "1 argument expected: [build/install/uninstall]"
 	exit 1
 fi
 
