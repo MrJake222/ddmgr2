@@ -7,4 +7,3 @@ $ORIGIN site.example.com.
 				604800     ; expire (1 week)
 				86400      ; minimum (1 day)
 )
-@		NS	net-rtr.site.example.com.

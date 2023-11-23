@@ -6,7 +6,7 @@ max-lease-time 86400;
 
 # Global definitions for name server address(es) and domain search list
 option dhcp6.name-servers fd00::1;
-option dhcp6.domain-search "home.local";
+option dhcp6.domain-search "site.example.com";
 
 subnet6 fd00::/64 {
 	range6 fd00::8000 fd00::FFFF;
