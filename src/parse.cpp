@@ -134,10 +134,15 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
                     ? hostinfo["cname"].as<std::vector<std::string>>()
                     : std::vector<std::string>{},
 
-                hostinfo["mx"]
-                    ? std::optional<int>{hostinfo["mx"].as<int>()}
-                    : std::nullopt
+                hostinfo["ns"]
+                    ? std::optional<dt::NS>{parse_ns(name, hostinfo["ns"]["for"].as<std::string>())}
+                    : std::nullopt,
 
+                hostinfo["mx"]
+                    ? std::optional<dt::MX>{parse_mx(name,
+                                                   hostinfo["mx"]["for"].as<std::string>(),
+                                                         hostinfo["mx"]["pri"].as<int>())}
+                    : std::nullopt
                 );
 
         const Host& host = hosts.back();
@@ -290,6 +295,14 @@ std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<
     return maps;
 }
 
+dt::NS parse_ns(const std::string &host, const std::string &for_domain) {
+    return { for_domain };
+}
+
+dt::MX parse_mx(const std::string &host, const std::string &for_domain, int pri) {
+    return { for_domain, pri };
+}
+
 void print_host(const Host& host) {
     cout << "host name=" << host.name << endl;
     cout << "  mac=" << host.mac.orig << " -> " << vs2s(host.mac.groups) << endl;
@@ -314,8 +327,11 @@ void print_host(const Host& host) {
         cout << m << " ";
     cout << endl;
 
+    if (host.ns)
+        cout << "  ns for " << host.ns->for_domain << endl;
+
     if (host.mx)
-        cout << "  mx=" << *host.mx << endl;
+        cout << "  mx for " << host.mx->for_domain << " pri " << host.mx->pri << endl;
 
     cout << endl;
 }

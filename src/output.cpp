@@ -33,9 +33,14 @@ void dns(std::ostream& os, const Subnet& subnet, bool internal) {
             dns_record(os, cname, subnet.maxlen, "CNAME", host.name);
         }
 
+        if (host.ns) {
+            dns_record(os, host.ns->for_domain, subnet.maxlen,
+                       "NS", host.name);
+        }
+
         if (host.mx) {
-            dns_record(os, "@", subnet.maxlen,
-                       "MX " + std::to_string(*host.mx), host.name);
+            dns_record(os, host.mx->for_domain, subnet.maxlen,
+                       "MX " + std::to_string(host.mx->pri), host.name);
         }
     }
 }

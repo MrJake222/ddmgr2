@@ -16,6 +16,8 @@
 #include <ipv4.hpp>
 #include <ipv6.hpp>
 #include <portmap.hpp>
+#include <ns.hpp>
+#include <mx.hpp>
 
 namespace parse {
 
@@ -52,6 +54,8 @@ dt::MAC parse_mac(const std::string& host, const std::string& in);
 dt::IPv4 parse_ipv4(const std::string& host, const std::string& in);
 dt::IPv6 parse_ipv6(const std::string& host, const std::string& in);
 std::vector<dt::PortMap> parse_ports(const std::string& host, const std::vector<std::string>& ports);
+dt::NS parse_ns(const std::string& host, const std::string& for_domain);
+dt::MX parse_mx(const std::string& host, const std::string& for_domain, int pri);
 
 
 // --------------- printing functions (debug) ---------------

@@ -9,6 +9,8 @@ hosts:
     mac: ca:fe:de:ad:be:ef
     ipv4: .0.1
     ipv6: ::1
+    ns:
+      for: '@'
     aname:
       - '@'
       
@@ -26,7 +28,9 @@ hosts:
       - ns2
       - mail
       - torrent
-    mx: 10
+    mx:
+      for: '@'
+      pri: 10
       
   npc:
     name: npc

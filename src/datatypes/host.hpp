@@ -9,6 +9,8 @@
 #include <ipv4.hpp>
 #include <ipv6.hpp>
 #include <portmap.hpp>
+#include <ns.hpp>
+#include <mx.hpp>
 
 class Host {
 
@@ -22,7 +24,8 @@ public:
     const std::vector<dt::PortMap> ports;
     const std::vector<std::string> aname;
     const std::vector<std::string> cname;
-    const std::optional<int> mx;
+    const std::optional<dt::NS> ns;
+    const std::optional<dt::MX> mx;
 
     Host(const std::string& name_,
          const dt::MAC& mac_,
@@ -31,7 +34,8 @@ public:
          const std::vector<dt::PortMap>& ports_,
          const std::vector<std::string>& aname_,
          const std::vector<std::string>& cname_,
-         const std::optional<int>& mx_)
+         const std::optional<dt::NS>& ns_,
+         const std::optional<dt::MX>& mx_)
             : name(name_)
             , mac(mac_)
             , ipv4(ipv4_)
@@ -39,6 +43,7 @@ public:
             , ports(ports_)
             , aname(aname_)
             , cname(cname_)
+            , ns(ns_)
             , mx(mx_)
             {
         anames_.emplace_back(name);

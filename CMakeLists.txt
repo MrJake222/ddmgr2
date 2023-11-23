@@ -13,6 +13,8 @@ add_executable(ddmgr2
         src/datatypes/ipv6.cpp
         src/datatypes/mac.cpp
         src/datatypes/portmap.cpp
+        src/datatypes/ns.cpp
+        src/datatypes/mx.cpp
         src/output.cpp
         )
 
