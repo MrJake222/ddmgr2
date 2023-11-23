@@ -26,7 +26,7 @@ if [[ $1 == "build" ]]; then
     mkdir ${IN_BUILD}
     cd ${IN_BUILD}
     cmake ../..
-    make -j4
+    make ${MAKEOPTS}
     echo "build done, now run $0 install"
     
 elif [[ $1 == "install" ]]; then

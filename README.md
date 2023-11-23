@@ -8,6 +8,24 @@ What's new?
 
 Requires `yaml-cpp` and `gflags` to be installed on the system.
 
+## Quick start
+- Install cmake, make, gcc
+    - Debian: `apt install cmake build-essential`
+- Install gflags, yamlcpp
+    - Debian: `apt install libgflags-dev libyaml-cpp-dev`
+- `git clone https://github.com/MrJake222/ddmgr2.git`
+- `cd ddmgr2/script`
+- `MAKEOPTS=-j4 ./install.sh build` (adjust number of cores)
+- `./install.sh install`
+- Edit files at `/usr/local/etc/ddmgr2`
+    - You may want to link config dir to regular `/etc`:
+      `ln -s /usr/local/etc/ddmgr2 /etc`
+- Edit `/etc/systemd/system/ddmgr2.service` to only be required by and
+  start before installed services
+- `systemctl enable ddmgr2 --now`
+- If you don't want to use systemd daemon just run `/usr/local/bin/ddmgr2_config.sh`
+  to regenerate config
+
 ## Program arguments
 ### Positional arguments
 * `config.yaml` -- path to file containing host/firewall/other defininitons (format below, required)

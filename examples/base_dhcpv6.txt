@@ -13,5 +13,3 @@ subnet6 fd00::/64 {
 }
 
 # static allocations
-
-host c1       { hardware ethernet 08:00:27:xx:xx:xx; fixed-address6 fd00::2; }
