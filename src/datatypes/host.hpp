@@ -18,8 +18,8 @@ class Host {
 
 public:
     const std::string name;
-    const dt::MAC mac;
     const dt::IPv4 ipv4;
+    const std::optional<dt::MAC> mac;
     const std::optional<dt::IPv6> ipv6;
     const std::vector<dt::PortMap> ports;
     const std::vector<std::string> aname;
@@ -28,8 +28,8 @@ public:
     const std::optional<dt::MX> mx;
 
     Host(const std::string& name_,
-         const dt::MAC& mac_,
          const dt::IPv4& ipv4_,
+         const std::optional<dt::MAC>& mac_,
          const std::optional<dt::IPv6>& ipv6_,
          const std::vector<dt::PortMap>& ports_,
          const std::vector<std::string>& aname_,
@@ -37,8 +37,8 @@ public:
          const std::optional<dt::NS>& ns_,
          const std::optional<dt::MX>& mx_)
             : name(name_)
-            , mac(mac_)
             , ipv4(ipv4_)
+            , mac(mac_)
             , ipv6(ipv6_)
             , ports(ports_)
             , aname(aname_)

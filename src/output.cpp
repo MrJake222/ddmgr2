@@ -57,9 +57,12 @@ std::string pad(const std::string& str, int to) {
 
 void dhcp(std::ostream& os, const Subnet& subnet) {
     for (const Host& host : subnet.hosts) {
+        if (!host.mac)
+            return;
+
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address 192.168.1.2; }
         os << "host " << pad(host.name, subnet.maxlen) << " { ";
-        os << "hardware ethernet " << host.mac.orig << "; ";
+        os << "hardware ethernet " << host.mac->orig << "; ";
         os << "fixed-address " << host.ipv4.orig << "; ";
         os << "}" << std::endl;
     }
@@ -67,12 +70,14 @@ void dhcp(std::ostream& os, const Subnet& subnet) {
 
 void dhcpv6(std::ostream& os, const Subnet& subnet) {
     for (const Host& host : subnet.hosts) {
+        if (!host.mac)
+            return;
         if (!host.ipv6)
             return;
 
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address6 fd00::1; }
         os << "host " << pad(host.name, subnet.maxlen) << " { ";
-        os << "hardware ethernet " << host.mac.orig << "; ";
+        os << "hardware ethernet " << host.mac->orig << "; ";
         os << "fixed-address6 " << host.ipv6->orig << "; ";
         os << "}" << std::endl;
     }

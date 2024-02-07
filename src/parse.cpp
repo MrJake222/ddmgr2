@@ -106,17 +106,19 @@ Subnet yaml_to_subnet(const YAML::Node& conf) {
         auto hostinfo = hostmap.second;
 
         // keys of host to be parsed:
-        // required: name, mac, ipv4
-        // optional: ipv6, ports, aname, cname, mx
+        // required: name, ipv4
+        // optional: mac, ipv6, ports, aname, cname, mx
 
         std::string name = checked_as(hostinfo, "name", "on host");
-        std::string mac  = checked_as(hostinfo, "mac", "on host " + name);
         std::string ipv4 = checked_as(hostinfo, "ipv4", "on host " + name);
 
         hosts.emplace_back(
                 name,
-                parse_mac(name, hostinfo["mac"].as<std::string>()),
                 parse_ipv4(name, v4_prefix + hostinfo["ipv4"].as<std::string>()),
+
+                hostinfo["mac"]
+                    ? std::optional<dt::MAC>{parse_mac(name, hostinfo["mac"].as<std::string>())}
+                    : std::nullopt,
 
                 hostinfo["ipv6"]
                     ? std::optional<dt::IPv6>{parse_ipv6(name, v6_prefix + hostinfo["ipv6"].as<std::string>())}
@@ -305,7 +307,11 @@ dt::MX parse_mx(const std::string &host, const std::string &for_domain, int pri)
 
 void print_host(const Host& host) {
     cout << "host name=" << host.name << endl;
-    cout << "  mac=" << host.mac.orig << " -> " << vs2s(host.mac.groups) << endl;
+    if (host.mac)
+        cout << "  mac=" << host.mac->orig << " -> " << vs2s(host.mac->groups) << endl;
+    else
+        cout << "  [no mac]" << endl;
+
     cout << "  ipv4=" << host.ipv4.orig << " -> " << vs2s(host.ipv4.groups) << endl;
     if (host.ipv6)
         cout << "  ipv6=" << host.ipv6->orig << " -> " << vs2s(host.ipv6->groups) << endl;

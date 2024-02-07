@@ -60,10 +60,10 @@ Consists of common config directives:
 Also contains `hosts` directive, which contains a list of hosts entries (keys don't matter).
 Value must contain:
 * `name` -- name (DNS compatible)
-* `mac` -- MAC address
 * `ipv4` -- v4 suffix (host octets with leading dot, ex. `.1.2`)
 
 Additionally user can specify:
+* `mac` -- MAC address
 * `ipv6` -- v6 suffix (host part, with leading `:` or `::`, ex. `::2`)
 * `ports` -- list of port forward definitions, format: `proto:external:internal`, for ex: `tcp:25:25`
     * `proto` -- which protocol to use
@@ -73,7 +73,7 @@ Additionally user can specify:
 * `cname` -- list of names; will generate `CNAME` records pointing to this host
 * `mx` -- mail exchange priority; will generate MX record for `@` pointing to this host
 
-Example input can be found in `examples/subnet.yaml`.
+Example input can be found in `examples/subnets.d/subnet.yaml`.
 
 This version has more trust for the user and doesn't check anything ;)
 (though it verifies MAC, IPv4, IPv6, port mappings compliance with standard)
