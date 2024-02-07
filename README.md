@@ -69,9 +69,10 @@ Additionally user can specify:
     * `proto` -- which protocol to use
     * `external` -- external port to use for dnat to this host internal port, can be omitted (no dnat, only firewall rules)
     * `internal` -- internal port
-* `aname` -- list of names; will generate `A`/`AAAA` records with the same name as host, useful for `@`.
+* `aname` -- list of names; will generate `A`/`AAAA` records with the same name as host, useful for `@`
 * `cname` -- list of names; will generate `CNAME` records pointing to this host
-* `mx` -- mail exchange priority; will generate MX record for `@` pointing to this host
+* `ns` -- name server, will generate `NS` record for given domain (key `for`) poiting to this host
+* `mx` -- mail exchange priority; will generate `MX` record for given domain (key `for`) with given priority (key `pri`) pointing to this host
 
 Example input can be found in `examples/subnets.d/subnet.yaml`.
 
