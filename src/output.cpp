@@ -58,7 +58,7 @@ std::string pad(const std::string& str, int to) {
 void dhcp(std::ostream& os, const Subnet& subnet) {
     for (const Host& host : subnet.hosts) {
         if (!host.mac)
-            return;
+            continue;
 
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address 192.168.1.2; }
         os << "host " << pad(host.name, subnet.maxlen) << " { ";
@@ -71,9 +71,9 @@ void dhcp(std::ostream& os, const Subnet& subnet) {
 void dhcpv6(std::ostream& os, const Subnet& subnet) {
     for (const Host& host : subnet.hosts) {
         if (!host.mac)
-            return;
+            continue;
         if (!host.ipv6)
-            return;
+            continue;
 
         // host NorbertPC { hardware ethernet 4C:CC:6A:XX:XX:XX; fixed-address6 fd00::1; }
         os << "host " << pad(host.name, subnet.maxlen) << " { ";
@@ -96,7 +96,7 @@ void dnsrev6(std::ostream& os, const Subnet& subnet) {
 
     for (const Host& host : subnet.hosts) {
         if (!host.ipv6)
-            return;
+            continue;
 
         dns_record(
                 os,

@@ -6,7 +6,6 @@ domain: site.example.com
 hosts:
   bastion:
     name: bastion
-    mac: ca:fe:de:ad:be:ef
     ipv4: .0.1
     ipv6: ::1
     ns:
@@ -16,7 +15,6 @@ hosts:
       
   bpi-nas:
     name: bpi
-    mac: ca:fe:de:ad:be:ef
     ipv4: .0.1
     ipv6: ::2
     ports:
