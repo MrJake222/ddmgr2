@@ -22,7 +22,8 @@ cp ${BASE_DHCPv6} ${OUT_DHCPv6}
 # nftables
 : > ${OUT_NFTABLES}
 
-# reverse v6 dns
+# reverse dns
+cp ${BASE_DNS_REV} ${OUT_DNS_REV}
 cp ${BASE_DNS_REV6} ${OUT_DNS_REV6}
 
 for yaml in ${DIR_CONF_SUBNETS}/*; do
@@ -33,9 +34,11 @@ for yaml in ${DIR_CONF_SUBNETS}/*; do
         --dhcpv6 ${OUT_DHCPv6}      \
         --dnsint ${OUT_DNS}.int     \
         --dnsext ${OUT_DNS}.ext     \
+        --dnsrev ${OUT_DNS_REV}     \
         --dnsrev6 ${OUT_DNS_REV6}   \
         --nft ${OUT_NFTABLES}       \
         \
+        --dnsrev_mask ${OUT_dnsrev_mask}   \
         --dnsrev6_mask ${OUT_dnsrev6_mask} \
         --nft_chain_filter_forward "${OUT_nft_chain_filter_forward}" \
         --nft_chain_nat_prerouting "${OUT_nft_chain_nat_prerouting}" \
