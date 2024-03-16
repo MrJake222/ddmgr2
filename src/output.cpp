@@ -100,6 +100,13 @@ void dnsrev(std::ostream& os, const Subnet& subnet) {
     const int max_len = (32 - FLAGS_dnsrev_mask) / 8 * 4;
 
     for (const Host& host : subnet.hosts) {
+
+        // generate nameserver record for reverse zone
+        if (host.ns && host.ns->for_domain == "@") {
+            dns_record(os, host.ns->for_domain, max_len,
+                       "NS", subnet.fqdn(host) + ".");
+        }
+
         dns_record(
                 os,
                 host.ipv4.ptr(FLAGS_dnsrev_mask),
