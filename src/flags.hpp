@@ -10,10 +10,12 @@ DECLARE_string(dhcp);
 DECLARE_string(dhcpv6);
 DECLARE_string(dnsext);
 DECLARE_string(dnsint);
+DECLARE_string(dnsrev);
 DECLARE_string(dnsrev6);
 DECLARE_string(nft);
 
-// dns rev v6
+// dns rev
+DECLARE_int32(dnsrev_mask);
 DECLARE_int32(dnsrev6_mask);
 
 // nft chains

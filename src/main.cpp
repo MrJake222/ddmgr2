@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
         check_write(FLAGS_dhcpv6,  "dhcpv6 ", output::dhcpv6,  subnet);
         check_write(FLAGS_dnsext,  "dnsext ", output::dnsext,  subnet);
         check_write(FLAGS_dnsint,  "dnsint ", output::dnsint,  subnet);
+        check_write(FLAGS_dnsrev,  "dnsrev",  output::dnsrev,  subnet);
         check_write(FLAGS_dnsrev6, "dnsrev6", output::dnsrev6, subnet);
         check_write(FLAGS_nft,     "nft    ", output::nft,     subnet);
     }

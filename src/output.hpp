@@ -24,6 +24,7 @@ void dhcp(std::ostream& os, const Subnet& subnet);
 void dhcpv6(std::ostream& os, const Subnet& subnet);
 void dnsext(std::ostream& os, const Subnet& subnet);
 void dnsint(std::ostream& os, const Subnet& subnet);
+void dnsrev(std::ostream& os, const Subnet& subnet);
 void dnsrev6(std::ostream& os, const Subnet& subnet);
 void nft(std::ostream& os, const Subnet& subnet);
 

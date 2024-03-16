@@ -91,6 +91,18 @@ void dnsint(std::ostream& os, const Subnet& subnet) {
     dns(os, subnet, true);
 }
 
+void dnsrev(std::ostream& os, const Subnet& subnet) {
+    // 1.1         PTR             c1.example.com.
+
+    for (const Host& host : subnet.hosts) {
+        dns_record(
+                os,
+                host.ipv4.ptr(FLAGS_dnsrev_mask), 0,
+                "PTR",
+                subnet.fqdn(host) + ".");
+    }
+}
+
 void dnsrev6(std::ostream& os, const Subnet& subnet) {
     // 1.0.0.0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         PTR             c1.example.com.
 
