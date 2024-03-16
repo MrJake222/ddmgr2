@@ -10,10 +10,16 @@ DIR_CONF="${DIR_PREFIX}/etc/${PROJ_NAME}"
 
 echo "preparing base files"
 
-# dns
-serial=$(date +"%y%m%d%H%M")
-cat ${BASE_DNS} | sed "s/SERIAL/${serial}/g" > ${OUT_DNS}.ext
-cat ${BASE_DNS} | sed "s/SERIAL/${serial}/g" > ${OUT_DNS}.int	
+# dns + reverse dns
+DNS_SERIAL=$(date +"%y%m%d%H%M")
+function gs {
+    # replace "SERIAL" with correct timestamp
+    sed "s/SERIAL/${DNS_SERIAL}/g" $1 > $2
+}
+gs ${BASE_DNS} ${OUT_DNS}.ext
+gs ${BASE_DNS} ${OUT_DNS}.int
+gs ${BASE_DNS_REV} ${OUT_DNS_REV}
+gs ${BASE_DNS_REV6} ${OUT_DNS_REV6}
 
 # dhcp
 cp ${BASE_DHCP} ${OUT_DHCP}
@@ -21,10 +27,6 @@ cp ${BASE_DHCPv6} ${OUT_DHCPv6}
 
 # nftables
 : > ${OUT_NFTABLES}
-
-# reverse dns
-cp ${BASE_DNS_REV} ${OUT_DNS_REV}
-cp ${BASE_DNS_REV6} ${OUT_DNS_REV6}
 
 for yaml in ${DIR_CONF_SUBNETS}/*; do
 	echo "parsing $yaml"

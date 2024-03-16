@@ -48,4 +48,4 @@ hosts:
   rigol-scope:
     name: rigol
     mac: aa:bb:cc:dd:ee:ff
-    ipv4: .1.5
+    ipv4: .1.55

@@ -94,10 +94,16 @@ void dnsint(std::ostream& os, const Subnet& subnet) {
 void dnsrev(std::ostream& os, const Subnet& subnet) {
     // 1.1         PTR             c1.example.com.
 
+    // subtract how many bits are defined by subnet
+    // divide by group size in bits
+    // multiply by max group width (3 decimal digits + dot)
+    const int max_len = (32 - FLAGS_dnsrev_mask) / 8 * 4;
+
     for (const Host& host : subnet.hosts) {
         dns_record(
                 os,
-                host.ipv4.ptr(FLAGS_dnsrev_mask), 0,
+                host.ipv4.ptr(FLAGS_dnsrev_mask),
+                max_len,
                 "PTR",
                 subnet.fqdn(host) + ".");
     }
