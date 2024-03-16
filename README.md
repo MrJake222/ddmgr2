@@ -40,15 +40,24 @@ to each specified file.
 * `--dhcpv6 <file>` -- ISC-DHCP server, v6
 * `--dnsint <file>` -- BIND9, internal view (private v4-prefix / v6-prefix)
 * `--dntext <file>` -- BIND9, external view (public v4 (same for all hosts) / v6-prefix)
+* `--dnsrev <file>` -- reverse DNS zone for v4 addresses
 * `--dnsrev6 <file>` -- reverse DNS zone for v6 addresses
 * `--nft <file>` -- nftables rules
 
-#### Program variables
-* `--verbose` -- enables printing of debug messages (default `false`)
-* `--dnsrev6_mask <int>` -- affects how log `--dnsrev6` results will be (`0` means full 128-bit entries, default `0`)
+#### Reverse zone parameters
+Values here are kind of tricky. It's the subnet mask, not how many bits will the entry contain.
+For example, host: `172.16.5.12/16` with `--dnsrev_mask 16` will generate `12.5  PTR  f.q.d.n.` in reverse zone.
+Default behaviour is to generate all octets/hextets. This way no subnet-specific `$ORIGIN` directives are needed in base files.
+* `--dnsrev_mask <int>` -- affects how long `--dnsrev` results will be (`0` means full 32-bit entries, default `0`)
+* `--dnsrev6_mask <int>` -- affects how long `--dnsrev6` results will be (`0` means full 128-bit entries, default `0`)
+
+#### NFTables chains
 * `--nft_chain_filter_forward <string>` -- nftables filter forward chain name (for firewall rules generation, default `FILTER FORWARD`)
 * `--nft_chain_nat_prerouting <string>` -- nftables nat prerouting chain name (for nat rules generation, default `NAT PREROUTING`)
 * `--nft_net_internal <string>` -- nftables internal networks variable (for dnat exclusion, default `$INTERNAL`)
+
+#### Debug variables
+* `--verbose` -- enables printing of debug messages (default `false`)
 
 ## Config file
 Consists of common config directives:
@@ -62,7 +71,7 @@ Value must contain:
 * `name` -- name (DNS compatible)
 * `ipv4` -- v4 suffix (host octets with leading dot, ex. `.1.2`)
 
-Additionally user can specify:
+Additionally, user can specify:
 * `mac` -- MAC address
 * `ipv6` -- v6 suffix (host part, with leading `:` or `::`, ex. `::2`)
 * `ports` -- list of port forward definitions, format: `proto:external:internal`, for ex: `tcp:25:25`
@@ -80,9 +89,19 @@ This version has more trust for the user and doesn't check anything ;)
 (though it verifies MAC, IPv4, IPv6, port mappings compliance with standard)
 
 ## Provided scripting infrastructure
-Scripting infra was placed in `script` directory:
-* `install.sh`
-Generates config files for basic services. Base files are copied to output files
-and to each output file script adds result of parsing subnet files.
+Scripting infra was placed in `script` directory.
+
+#### `install.sh` -- Installation script
+Can install/uninstall/update `ddmgr2`.
+
+#### `ddmgr2.service` -- Installation script
+Systemd service which can be used to generate config before any other system service using those files starts.
+
+#### `ddmgr2_config.sh` -- Config generation helper
+Multiple subnets are supported.
 Subnets are located in (assuming `/usr/local` prefix): `/usr/local/etc/ddmgr2/subnets.d`.
-Folder should contain differently named `.yaml` files which define what was said above.
+Folder should contain differently named `.yaml` files, which are then sequentially passed to `ddmgr2`
+to generate config and append it to global system files.
+For the files to not grow indefinitely, the concept of base files is used.
+They are read-only files that hold common config without auto-generated hosts entries.
+Base files are used to copy over the generated content with unmodified versions.
